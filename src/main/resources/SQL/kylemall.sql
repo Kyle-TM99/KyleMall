@@ -129,19 +129,25 @@ CREATE TABLE IF NOT EXISTS shipping (
 SELECT * FROM shipping;
 
 ######## 채팅방 ########
-DROP TABLE IF EXISTS chat_message;  -- 먼저 메시지 테이블을 삭제
-DROP TABLE IF EXISTS chat_room;     -- 그 다음 채팅방 테이블 삭제
+DROP TABLE IF EXISTS chat_message;  
+DROP TABLE IF EXISTS chat_room;     
 
 CREATE TABLE IF NOT EXISTS chat_room (
     room_id VARCHAR(50) PRIMARY KEY,
     room_name VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_by VARCHAR(50) NOT NULL,
+    room_password VARCHAR(100),  -- 비공개방 비밀번호 (NULL이면 공개방)
+    max_users INT DEFAULT 100,   -- 최대 참여 인원
+    current_users INT DEFAULT 0, -- 현재 참여 인원
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_room_creator FOREIGN KEY (created_by) REFERENCES member(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS chat_message (
     message_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     room_id VARCHAR(50) NOT NULL,
-    sender VARCHAR(20) NOT NULL,
+    sender VARCHAR(50) NOT NULL,
+    nickname VARCHAR(20) NOT NULL,
     message TEXT NOT NULL,
     message_type VARCHAR(10) NOT NULL,
     sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -149,8 +155,19 @@ CREATE TABLE IF NOT EXISTS chat_message (
     CONSTRAINT fk_chat_sender FOREIGN KEY (sender) REFERENCES member(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- chat_message 테이블에 nickname 컬럼 추가
-ALTER TABLE chat_message ADD COLUMN nickname VARCHAR(20) AFTER sender;
+-- 채팅방 참여자 테이블 추가
+CREATE TABLE IF NOT EXISTS chat_room_participant (
+    room_id VARCHAR(50),
+    member_id VARCHAR(50),
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (room_id, member_id),
+    CONSTRAINT fk_participant_room FOREIGN KEY (room_id) REFERENCES chat_room(room_id),
+    CONSTRAINT fk_participant_member FOREIGN KEY (member_id) REFERENCES member(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 기본 공개 채팅방 생성
+INSERT INTO chat_room (room_id, room_name, created_by) 
+VALUES ('public', '공개 채팅방', 'admin');
 
 ######### faq 게시판 ########
 DROP TABLE IF EXISTS faq;
@@ -216,7 +233,7 @@ INSERT INTO product (product_name, product_description, product_price, stock_qua
 ('데님 청바지', '신축성 좋은 데님 소재 청바지.', 40000, 30, NULL, CURRENT_TIMESTAMP, NULL, 3, 0, NULL),
 ('롱패딩', '한겨울을 따뜻하게 보낼 롱패딩입니다.', 120000, 10, NULL, CURRENT_TIMESTAMP, NULL, 1, 1, 100000),
 ('체크 셔츠', '스타일리시한 체크 패턴 셔츠입니다.', 30000, 25, NULL, CURRENT_TIMESTAMP, NULL, 2, 0, NULL),
-('슬림핏 슬랙스', '직장인 필수템, 슬림핏 슬랙스.', 45000, 18, NULL, CURRENT_TIMESTAMP, NULL, 3, 1, 40000),
+('슬림핏 슬랙스', '직장인 필수템, 슬림핏 슬슬랙스.', 45000, 18, NULL, CURRENT_TIMESTAMP, NULL, 3, 1, 40000),
 ('기모 맨투맨', '기모 소재로 보온성을 높인 맨투맨입니다.', 28000, 40, NULL, CURRENT_TIMESTAMP, NULL, 2, 1, 25000),
 ('울 코트', '세련된 디자인의 울 코트.', 85000, 8, 'kylemallproducts/ulcoat.jpg', CURRENT_TIMESTAMP, NULL, 1, 1, 80000),
 ('하프팬츠', '여름철 필수템 하프팬츠.', 20000, 50, NULL, CURRENT_TIMESTAMP, NULL, 3, 0, NULL),

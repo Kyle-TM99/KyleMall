@@ -105,7 +105,7 @@ public class MemberController {
 		return "redirect:/mainList";
 	}
 	
-	@GetMapping("/memberLogout")
+	@GetMapping("/logout")
 	public String logout(HttpSession session) {
 		session.invalidate();  // 세션 완전히 제거
 		return "redirect:/loginForm";
