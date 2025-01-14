@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/main_layout}">
+<th:block layout:fragment="content">
+	<!-- Hero Section -->
+	<div class="my-5">
+		<div class="hero-section position-relative">
+			<div class="hero-content position-absolute top-50 start-50 translate-middle text-center text-white w-100">
+				<h1 class="display-3 fw-bold mb-4">KYLEMALL</h1>
+				<p class="lead mb-5">Discover Your Style, Define Your Fashion</p>
+				<div class="search-container">
+					<form action="/productList" method="get" class="d-flex justify-content-center">
+						<div class="input-group" style="max-width: 600px;">
+							<input type="text" name="keyword" class="form-control form-control-lg"
+								placeholder="찾으시는 상품을 검색해보세요" style="border-radius: 30px 0 0 30px;">
+							<button type="submit" class="btn btn-primary px-4" style="border-radius: 0 30px 30px 0;">
+								<i class="bi bi-search"></i> 검색
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- NEW Section -->
+	<section class="py-5">
+		<div class="container">
+			<div class="section-header d-flex justify-content-between align-items-center mb-4">
+				<h2 class="fw-bold">NEW ARRIVALS</h2>
+				<a href="#" class="text-decoration-none text-primary">전체보기 <i class="bi bi-arrow-right"></i></a>
+			</div>
+			<div class="row g-4">
+				<th:block th:if="${not #lists.isEmpty(nList)}">
+					<th:block th:each="product, status:${nList}">
+						<div class="col-6 col-md-4 col-lg-3">
+							<div class="product-card card h-100 border-0 shadow-sm">
+								<div class="position-relative">
+									<th:block th:if="${product.saleOk == '1'}">
+										<div class="badge bg-danger position-absolute top-0 end-0 m-3">SALE</div>
+									</th:block>
+									<div class="product-image-wrapper">
+										<th:block th:unless="${product.imageUrl == null}">
+											<img class="card-img-top" th:src="'kylemallproducts/'+${product.imageUrl}"
+												th:alt="${product.productName}" />
+										</th:block>
+										<th:block th:if="${product.imageUrl == null}">
+											<img class="card-img-top"
+												src="https://dummyimage.com/300x400/dee2e6/6c757d.jpg"
+												th:alt="${product.productName}" />
+										</th:block>
+									</div>
+								</div>
+								<div class="card-body text-center">
+									<h5 class="product-title">[[${product.productName}]]</h5>
+									<div class="product-price">
+										<th:block th:unless="${product.saleOk == '1'}">
+											<span class="price">[[${#numbers.formatInteger(product.productPrice, 3,
+												'COMMA')}]]원</span>
+										</th:block>
+										<th:block th:if="${product.saleOk == '1'}">
+											<span class="original-price text-muted text-decoration-line-through">
+												[[${#numbers.formatInteger(product.productPrice, 3, 'COMMA')}]]원
+											</span>
+											<span class="sale-price text-danger">
+												[[${#numbers.formatInteger(product.salePrice, 3, 'COMMA')}]]원
+											</span>
+										</th:block>
+									</div>
+									<a th:href="@{productDetail(no=${product.productNo},category=${product.categoryName == '아우터' ? 1 : (product.categoryName == '상의' ? 2 : 3)})}"
+										class="btn btn-outline-primary w-100 mt-3">상세보기</a>
+								</div>
+							</div>
+						</div>
+					</th:block>
+				</th:block>
+			</div>
+		</div>
+	</section>
+
+	<!-- BEST Section -->
+	<section class="py-5">
+		<div class="container">
+			<div class="section-header d-flex justify-content-between align-items-center mb-4">
+				<h2 class="fw-bold">BEST SELLERS</h2>
+				<a href="#" class="text-decoration-none text-primary">전체보기 <i class="bi bi-arrow-right"></i></a>
+			</div>
+			<div class="row g-4">
+				<th:block th:if="${not #lists.isEmpty(bList)}">
+					<th:block th:each="product, status:${bList}">
+						<div class="col-6 col-md-4 col-lg-3">
+							<div class="product-card card h-100 border-0 shadow-sm">
+								<div class="position-relative">
+									<th:block th:if="${product.saleOk == '1'}">
+										<div class="badge bg-danger position-absolute top-0 end-0 m-3">SALE</div>
+									</th:block>
+									<div class="product-image-wrapper">
+										<th:block th:unless="${product.imageUrl == null}">
+											<img class="card-img-top" th:src="'kylemallproducts/'+${product.imageUrl}"
+												th:alt="${product.productName}" />
+										</th:block>
+										<th:block th:if="${product.imageUrl == null}">
+											<img class="card-img-top"
+												src="https://dummyimage.com/300x400/dee2e6/6c757d.jpg"
+												th:alt="${product.productName}" />
+										</th:block>
+									</div>
+								</div>
+								<div class="card-body text-center">
+									<h5 class="product-title">[[${product.productName}]]</h5>
+									<div class="product-price">
+										<th:block th:unless="${product.saleOk == '1'}">
+											<span class="price">[[${#numbers.formatInteger(product.productPrice, 3,
+												'COMMA')}]]원</span>
+										</th:block>
+										<th:block th:if="${product.saleOk == '1'}">
+											<span class="original-price text-muted text-decoration-line-through">
+												[[${#numbers.formatInteger(product.productPrice, 3, 'COMMA')}]]원
+											</span>
+											<span class="sale-price text-danger">
+												[[${#numbers.formatInteger(product.salePrice, 3, 'COMMA')}]]원
+											</span>
+										</th:block>
+									</div>
+									<a th:href="@{productDetail(no=${product.productNo},category=${product.categoryName == '아우터' ? 1 : (product.categoryName == '상의' ? 2 : 3)})}"
+										class="btn btn-outline-primary w-100 mt-3">상세보기</a>
+								</div>
+							</div>
+						</div>
+					</th:block>
+				</th:block>
+			</div>
+		</div>
+	</section>
+</th:block>
+
+</html>

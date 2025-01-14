@@ -1,0 +1,67 @@
+<!--/* 
+	회원 가입시 아이디 중복검사 요청에 대한 처리 결과를 출력할 View 페이지
+	이 페이지는 새창으로 실행되고 중복 아이디 체크를 할 수 있는 폼을 제공한다.
+	
+	회원 가입 폼에서 아이디 중복확인 버튼을 클릭하면 이 페이지만 새 창으로
+	보여야 하므로 레이아웃 템플릿은 사용하지 않고 단독으로 실행될 수 있도록 했다.
+*/-->    
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<link th:href="@{bootstrap/bootstrap.min.css}" rel="stylesheet" >
+    <script th:src="@{js/jquery-3.7.1.min.js}"></script>    
+    <script th:src="@{js/member.js}"></script> 
+	<title>중복 아이디 체크</title>
+</head>
+<body>
+	<div class="row my-5" id="global-content">			
+		<div class="col" th:if=${overlap}>
+			<div class="row text-center">
+				<div class="col">
+					<h2 class="fs-3 fw-bold">사용할 수 없는 아이디</h2>
+				</div>
+			</div>
+			<div class="row my-3 text-center">
+				<div class="col">
+					입력하신 [[${id}]]는 이미 사용 중인 아이디 입니다.
+				</div>
+			</div>
+			<div class="row my-3">
+				<div class="col  text-center">
+					다른 아이디를 선택해 주세요
+				</div>
+			</div>							
+			<form action="overlapIdCheck" name="idCheckForm" 
+					method="post" id="idCheckForm" class="row mt-5">			
+				<div class="col-10 offset-1">
+					<div class="input-group">
+						<span class="input-group-text">* 아이디 : </span>								
+						<input type="text" class="form-control" name="id" id="checkId">
+						<input type="submit" class="btn btn-primary" value="중복확인">
+					</div>						
+				</div>
+			</form>		
+		</div>
+		<div class="col" th:unless=${overlap}>
+			<div class="row text-center">
+				<div class="col">
+					<h2 class="fs-3 fw-bold">사용할 수 있는 아이디</h2>
+				</div>
+			</div>
+			<div class="row my-3 text-center">
+				<div class="col">
+					입력하신 [[${id}]]는 사용할 수 있는 아이디 입니다.
+				</div>
+			</div>
+			<div class="row mt-5">
+				<div class="col  text-center">
+					<input type="button" th:value="|${id}을(를) 사용하기|"
+					id="btnIdCheckClose" th:data-id-value="${id}" class="btn btn-primary">
+				</div>
+			</div>		
+		</div>		
+	</div>
+</body>
+</html>
+

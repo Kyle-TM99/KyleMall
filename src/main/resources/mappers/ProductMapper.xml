@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--	
+	마이바티스 참고 사이트
+	  - http://blog.mybatis.org/
+	  - http://www.mybatis.org/mybatis-3/ko/index.html
+	  
+	@Mapper 애노테이션이 적용된 인터페이스와 맵퍼 XML파일은
+	namespace 속성으로 연결되기 때문에 맵퍼 XML의 namespace를
+	지정할 때 @Mapper 애노테이션이 적용된 맵퍼 인터페이스의
+	완전한 클래스 이름(패키지를 포함한 이름)을 지정하면 된다.   
+-->
+<mapper namespace="com.kylemall.shop.mapper.ProductMapper">
+
+<!-- 관리자가 상품을 등록하는 맵핑 구문 -->
+<insert id="addProduct" parameterType="Product">
+	INSERT INTO product (product_name, product_description, product_price, stock_quantity, image_url, created_at, updated_at, category_no, sale_ok, sale_price) VALUES
+	(#{productName}, #{productDescription}, #{productPrice}, #{stockQuantity}, #{imageUrl}, SYSDATE(), SYSDATE(), #{categoryName}, #{saleOk}, #{salePrice})
+</insert>
+
+<!-- 하나의 상품 정보를 가져오는 맵핑 구문 -->
+<select id="getProduct" resultType="Product">
+	SELECT
+	p.product_no, p.product_name, p.product_description, p.product_price, p.stock_quantity,
+	p.image_url, p.created_at, p.updated_at, c.category_name, p.sale_ok, p.sale_price
+	FROM 
+	product AS p
+	JOIN
+	category AS c ON p.category_no = c.category_no
+	WHERE
+	p.product_no = #{no}
+	ORDER BY
+	p.created_at DESC
+</select>
+
+<!-- 전체 상품 리스트를 가져오는 맵핑 구문 -->
+<select id="productList" parameterType="map" resultType="Product">
+	SELECT
+	p.product_no, p.product_name, p.product_description, p.product_price, p.stock_quantity,
+	p.image_url, p.created_at, p.updated_at, c.category_name, p.sale_ok, p.sale_price
+	FROM 
+	product AS p
+	JOIN
+	category AS c ON p.category_no = c.category_no
+	<where>
+		<trim prefixOverrides="AND">
+			<if test="category != 0">
+				c.category_no = #{category}
+			</if>
+			<if test="type == 'title'">
+				AND p.product_name LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+		</trim>
+	</where>
+	<choose>
+		<when test="sortBy == 'name'">
+			ORDER BY p.product_name
+		</when>
+		<otherwise>
+			ORDER BY p.created_at DESC
+		</otherwise>
+	</choose>
+	LIMIT #{startRow}, #{num}
+</select>
+
+<!-- 전체 상품 리스트의 수를 가져오는 맵핑 구문 -->
+<select id="productCount" parameterType="map" resultType="int">
+	SELECT
+	COUNT(*)
+	FROM 
+	product AS p
+	JOIN
+	category AS c ON p.category_no = c.category_no
+	<where>
+		<trim prefixOverrides="AND">
+			<if test="category != 0">
+				c.category_no = #{category}
+			</if>
+			<if test="type == 'title'">
+				AND p.product_name LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+		</trim>
+	</where>
+</select>
+
+</mapper>	

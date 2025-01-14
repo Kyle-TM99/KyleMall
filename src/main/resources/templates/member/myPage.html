@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main_layout}">
+<head>
+    <title>마이페이지</title>
+    <style>
+        .mypage-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .profile-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-info h3 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 500;
+        }
+
+        .profile-info p {
+            margin: 5px 0 0;
+            color: #666;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card h4 {
+            font-size: 1.8rem;
+            margin: 0;
+            color: #333;
+        }
+
+        .stat-card p {
+            margin: 5px 0 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .content-tabs {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .tab-header {
+            display: flex;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tab-btn {
+            padding: 15px 30px;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            color: #666;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tab-btn.active {
+            color: #000;
+            font-weight: 500;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #000;
+        }
+
+        .order-list {
+            padding: 20px;
+        }
+
+        .order-item {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .order-item:hover {
+            border-color: #ddd;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .order-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .order-status {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            background: #e9ecef;
+        }
+
+        .order-status.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .btn-outline-custom {
+            border: 1px solid #ddd;
+            padding: 8px 20px;
+            border-radius: 20px;
+            background: none;
+            color: #333;
+            transition: all 0.2s ease;
+        }
+
+        .btn-outline-custom:hover {
+            background: #f8f9fa;
+            border-color: #333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 15px;
+        }
+
+        .nav-tabs .nav-link {
+            color: #666;
+            border: none;
+            padding: 1rem 2rem;
+            font-weight: 500;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #4A90E2;
+            border-bottom: 2px solid #4A90E2;
+            background: none;
+        }
+
+        .nav-tabs .nav-link:hover {
+            border-color: transparent;
+            isolation: isolate;
+        }
+
+        .tab-content {
+            background: white;
+            border-radius: 0 0 10px 10px;
+        }
+
+        /* 모달 스타일 추가 */
+        .modal-content {
+            border: none;
+            border-radius: 15px;
+        }
+
+        .modal-header {
+            padding: 1.5rem 1.5rem 0.5rem;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem 1.5rem;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .bg-light {
+            background-color: #f8f9fa !important;
+        }
+    </style>
+    <link rel="stylesheet" href="css/mypage.css">
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="mypage-container">
+        <!-- 프로필 섹션 -->
+        <div class="profile-card text-center">
+            <div class="profile-header">
+                <img th:src="${member.profileImage}" alt="Profile" class="profile-image">
+                <div class="profile-info">
+                    <h3>[[${member.nickname}]]</h3>
+                    <p>[[${member.email}]]</p>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>₩[[${totalSpent}]]</h4>
+                    <p>총 구매액</p>
+                </div>
+                <div class="stat-card">
+                    <h4 th:text="${#lists.size(orderSummary)}">0</h4>
+                    <p>총 주문 건수</p>
+                </div>
+                <div class="stat-card">
+                    <button class="btn-outline-custom" onclick="location.href='memberUpdateForm'">
+                        프로필 수정
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 컨텐츠 섹션 -->
+        <div class="content-tabs">
+            <!-- 탭 네비게이션 -->
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="orders-tab" data-bs-toggle="tab" 
+                            data-bs-target="#orders" type="button" role="tab" 
+                            aria-controls="orders" aria-selected="true">
+                        주문 내역
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="settings-tab" data-bs-toggle="tab" 
+                            data-bs-target="#settings" type="button" role="tab" 
+                            aria-controls="settings" aria-selected="false">
+                        설정
+                    </button>
+                </li>
+            </ul>
+
+            <!-- 탭 컨텐츠 -->
+            <div class="tab-content" id="myTabContent">
+                <!-- 주문 내역 탭 -->
+                <div class="tab-pane fade show active" id="orders" role="tabpanel" 
+                     aria-labelledby="orders-tab">
+                    <div class="order-list p-4">
+                        <div th:if="${not #lists.isEmpty(orderSummary)}">
+                            <div class="order-item" th:each="order : ${orderSummary}">
+                                <div class="order-header">
+                                    <span class="order-date">[[${#dates.format(order.orderCreatedAt, 'yyyy.MM.dd')}]]</span>
+                                    <span class="order-status" th:classappend="${order.orderStatus == '배송완료' ? 'completed' : ''}">
+                                        [[${order.orderStatus}]]
+                                    </span>
+                                </div>
+                                <h5>[[${order.productTitle}]]</h5>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <span class="fs-5">₩[[${order.amount}]]</span>
+                                    <button class="btn-outline-custom btn-order-detail"
+                                            th:data-order-date="${#dates.format(order.orderCreatedAt, 'yyyy.MM.dd')}"
+                                            th:data-order-status="${order.orderStatus}"
+                                            th:data-order-title="${order.productTitle}"
+                                            th:data-order-number="${order.merchantUid}"
+                                            th:data-order-amount="${order.amount}"
+                                            th:data-recipient-name="${order.recipientName}"
+                                            th:data-recipient-phone="${order.phoneNumber}"
+                                            th:data-recipient-address="${order.address}"
+                                            th:data-payment-method="${order.paymentMethod}"
+                                            th:data-payment-status="${order.paymentStatus}">
+                                        주문 상세
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:if="${#lists.isEmpty(orderSummary)}" class="empty-state">
+                            <i class="bi bi-bag"></i>
+                            <p>아직 주문 내역이 없습니다.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 설정 탭 -->
+                <div class="tab-pane fade" id="settings" role="tabpanel" 
+                     aria-labelledby="settings-tab">
+                    <div class="p-4 text-center">
+                        <button id="deleteMember" class="btn btn-danger">
+                            회원 탈퇴
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 주문 상세 모달 -->
+<div class="modal fade" id="orderDetailModal" tabindex="-1" role="dialog" aria-labelledby="orderDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="orderDetailModalLabel">주문 상세 내역</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <!-- 주문 정보 -->
+                <div class="order-info mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted small order-date-modal"></span>
+                        <span class="badge bg-primary order-status-modal"></span>
+                    </div>
+                    <h6 class="fw-bold mb-2 order-title-modal"></h6>
+                    <p class="text-muted mb-0 small">주문번호: <span class="order-number-modal"></span></p>
+                </div>
+
+                <!-- 배송 정보 -->
+                <div class="delivery-info mb-4">
+                    <h6 class="fw-bold mb-3">배송 정보</h6>
+                    <div class="bg-light rounded p-3">
+                        <div class="row mb-2">
+                            <div class="col-4 text-muted small">받는 사람</div>
+                            <div class="col-8 small recipient-name-modal"></div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4 text-muted small">연락처</div>
+                            <div class="col-8 small recipient-phone-modal"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 text-muted small">배송 주소</div>
+                            <div class="col-8 small recipient-address-modal"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 결제 정보 -->
+                <div class="payment-info">
+                    <h6 class="fw-bold mb-3">결제 정보</h6>
+                    <div class="bg-light rounded p-3">
+                        <div class="row mb-2">
+                            <div class="col-4 text-muted small">상품 금액</div>
+                            <div class="col-8 small order-amount-modal"></div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4 text-muted small">결제 수단</div>
+                            <div class="col-8 small payment-method-modal"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 text-muted small">결제 상태</div>
+                            <div class="col-8 small payment-status-modal"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 justify-content-end">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 탭 동작을 위한 JavaScript 추가 -->
+<script>
+$(document).ready(function() {
+    // 탭 초기화
+    $('[data-bs-toggle="tab"]').tab();
+
+    // 주문 상세 버튼 클릭 이벤트
+    $('.btn-order-detail').on('click', function() {
+        // 데이터 가져오기
+        var orderData = {
+            date: $(this).data('order-date'),
+            status: $(this).data('order-status'),
+            title: $(this).data('order-title'),
+            number: $(this).data('order-number'),
+            amount: $(this).data('order-amount'),
+            recipientName: $(this).data('recipient-name'),
+            recipientPhone: $(this).data('recipient-phone'),
+            recipientAddress: $(this).data('recipient-address'),
+            paymentMethod: $(this).data('payment-method'),
+            paymentStatus: $(this).data('payment-status')
+        };
+
+        // 모달에 데이터 채우기
+        $('.order-date-modal').text(orderData.date);
+        $('.order-status-modal').text(orderData.status);
+        $('.order-title-modal').text(orderData.title);
+        $('.order-number-modal').text(orderData.number);
+        $('.order-amount-modal').text('₩' + orderData.amount);
+        $('.recipient-name-modal').text(orderData.recipientName);
+        $('.recipient-phone-modal').text(orderData.recipientPhone);
+        $('.recipient-address-modal').text(orderData.recipientAddress);
+        $('.payment-method-modal').text(orderData.paymentMethod);
+        $('.payment-status-modal').text(orderData.paymentStatus);
+
+        // 모달 표시
+        $('#orderDetailModal').modal('show');
+    });
+
+    // 모달 닫기 버튼
+    $('.btn-close, .btn-secondary').on('click', function() {
+        $('#orderDetailModal').modal('hide');
+    });
+});
+</script>
+</body>
+</html>

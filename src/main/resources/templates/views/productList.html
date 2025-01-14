@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/main_layout}">
+<th:block layout:fragment="content">
+	<!-- Hero Section -->
+	<div class="hero-section position-relative">
+		<div class="hero-content position-absolute top-50 start-50 translate-middle text-center text-white w-100">
+			<th:block th:if="${category == 1}">
+				<h1 class="display-4 fw-light mb-4" th:text="#{pro.list.category.outer}">OUTER</h1>
+				<p class="lead" th:text="#{pro.list.category.outer.desc}">카테고리 소개 문구</p>
+			</th:block>
+			<th:block th:if="${category == 2}">
+				<h1 class="display-4 fw-light mb-4" th:text="#{pro.list.category.top}">TOP</h1>
+				<p class="lead" th:text="#{pro.list.category.top.desc}">카테고리 소개 문구</p>
+			</th:block>
+			<th:block th:if="${category == 3}">
+				<h1 class="display-4 fw-light mb-4" th:text="#{pro.list.category.bottom}">BOTTOM</h1>
+				<p class="lead" th:text="#{pro.list.category.bottom.desc}">카테고리 소개 문구</p>
+			</th:block>
+			<th:block th:if="${searchOption}">
+				<h1 class="display-4 fw-light mb-4">"[[${keyword}]]"</h1>
+				<p class="lead">검색 결과</p>
+			</th:block>
+		</div>
+	</div>
+
+	<!-- Product Section -->
+	<section class="py-5">
+		<div class="container">
+			<!-- 필터 및 정렬 옵션 -->
+			<div class="d-flex justify-content-between align-items-center mb-4">
+				<div class="filter-section d-flex gap-3">
+					<select class="sort-select" onchange="location = this.value;">
+						<option value="?category=${category}&orderType=newest" th:selected="${orderType == 'newest'}">최신순</option>
+						<option value="?category=${category}&orderType=priceAsc" th:selected="${orderType == 'priceAsc'}">가격 낮은순</option>
+						<option value="?category=${category}&orderType=priceDesc" th:selected="${orderType == 'priceDesc'}">가격 높은순</option>
+					</select>
+				</div>
+			</div>
+
+			<!-- 상품 목록 -->
+			<div class="row g-4">
+				<th:block th:if="${not #lists.isEmpty(pList)}">
+					<th:block th:each="product, status:${pList}">
+						<div class="col-6 col-md-4 col-lg-3">
+							<div class="product-card">
+								<div class="product-image-wrapper">
+									<th:block th:if="${product.saleOk == '1'}">
+										<div class="badge bg-danger position-absolute top-0 end-0 m-3">SALE</div>
+									</th:block>
+									<th:block th:unless="${product.imageUrl == null}">
+										<img th:src="'kylemallproducts/'+${product.imageUrl}" 
+											th:alt="${product.productName}"/>
+									</th:block>
+									<th:block th:if="${product.imageUrl == null}">
+										<img src="https://dummyimage.com/300x400/dee2e6/6c757d.jpg" 
+											th:alt="${product.productName}"/>
+									</th:block>
+								</div>
+								<div class="card-body text-center">
+									<h5 class="product-title">[[${product.productName}]]</h5>
+									<div class="product-price">
+										<th:block th:unless="${product.saleOk == '1'}">
+											<span class="price">[[${#numbers.formatInteger(product.productPrice, 3, 'COMMA')}]]원</span>
+										</th:block>
+										<th:block th:if="${product.saleOk == '1'}">
+											<span class="original-price">[[${#numbers.formatInteger(product.productPrice, 3, 'COMMA')}]]원</span>
+											<span class="sale-price">[[${#numbers.formatInteger(product.salePrice, 3, 'COMMA')}]]원</span>
+										</th:block>
+									</div>
+									<a th:href="@{productDetail(no=${product.productNo},category=${category})}" 
+										class="btn btn-outline-primary w-100">상세보기</a>
+								</div>
+							</div>
+						</div>
+					</th:block>
+				</th:block>
+				<th:block th:if="${#lists.isEmpty(pList)}">
+					<div class="col-12 text-center">
+						<p class="text-muted">등록된 �품이 존재하지 않습니다.</p>
+					</div>
+				</th:block>
+			</div>
+
+			<!-- 페이지네이션 -->
+			<div class="row mt-5">
+				<div class="col">
+					<nav th:if="${searchOption and not #lists.isEmpty(pList)}" aria-label="Page navigation">
+						<ul class="pagination justify-content-center">
+							<li class="page-item" th:if="${startPage > pageGroup}">
+								<a class="page-link" th:href="@{|?pageNum=${startPage - 1}&type=${type}&keyword=${keyword}&category=${category}|}">
+									<span aria-hidden="true">&laquo;</span>
+								</a>
+							</li>
+							<li th:each="num : ${#numbers.sequence(startPage, endPage)}" 
+								th:class="${num == currentPage ? 'page-item active' : 'page-item'}">
+								<a class="page-link" th:text="${num}" 
+									th:href="${num != currentPage ? '?pageNum=' + num + '&type=' + type + '&keyword=' + keyword + '&category=' + category : '#'}">1</a>
+							</li>
+							<li class="page-item" th:if="${endPage < pageCount}">
+								<a class="page-link" th:href="@{|?pageNum=${startPage + pageGroup}&type=${type}&keyword=${keyword}&category=${category}|}">
+									<span aria-hidden="true">&raquo;</span>
+								</a>
+							</li>
+						</ul>
+					</nav>
+
+					<nav th:if="${not searchOption and not #lists.isEmpty(pList)}" aria-label="Page navigation">
+						<ul class="pagination justify-content-center">
+							<li class="page-item" th:if="${startPage > pageGroup}">
+								<a class="page-link" th:href="@{|?pageNum=${startPage - 1}&category=${category}|}">
+									<span aria-hidden="true">&laquo;</span>
+								</a>
+							</li>
+							<li th:each="num : ${#numbers.sequence(startPage, endPage)}" 
+								th:class="${num == currentPage ? 'page-item active' : 'page-item'}">
+								<a class="page-link" th:text="${num}" 
+									th:href="${num != currentPage ? '?pageNum=' + num + '&category=' + category + '&orderType=' + orderType : '#'}">1</a>
+							</li>
+							<li class="page-item" th:if="${endPage < pageCount}">
+								<a class="page-link" th:href="@{|?pageNum=${startPage + pageGroup}&category=${category}&orderType=${orderType}|}">
+									<span aria-hidden="true">&raquo;</span>
+								</a>
+							</li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		</div>
+	</section>
+</th:block>
+
+</html>

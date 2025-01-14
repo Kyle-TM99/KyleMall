@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/main_layout}">
+
+<head>
+	<style>
+		.form-control:focus,
+		.form-select:focus {
+			border-color: #4A90E2;
+			box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+		}
+
+		.btn-primary {
+			background-color: #4A90E2;
+			border-color: #4A90E2;
+		}
+
+		.btn-primary:hover {
+			background-color: #357ABD;
+			border-color: #357ABD;
+		}
+
+		.form-label {
+			font-size: 0.9rem;
+			color: #495057;
+		}
+
+		.input-group-text {
+			background-color: #f8f9fa;
+			border-color: #ced4da;
+		}
+	</style>
+</head>
+<div layout:fragment="content">
+
+	<!-- JavaScript -->
+	<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	<script th:src="@{/js/member.js}"></script>
+
+	<div class="container d-flex justify-content-center align-items-center py-5" style="min-height: 80vh;">
+		<div class="card shadow-lg my-5" style="width: 500px; border-radius: 15px; border: none;">
+			<div class="card-body p-5">
+
+				<h2 class="text-center mb-4 fw-light">추가 정보 입력</h2>
+				<p class="text-center text-muted mb-4">Google 계정으로 회원가입을 완료하기 위해<br>추가 정보를 입력해주세요.</p>
+
+				<form action="/google/register" method="post">
+					<input type="hidden" name="id" th:value="${googleEmail}">
+					<input type="hidden" name="nickname" th:value="${googleName}">
+					<input type="hidden" name="profileImage" th:value="${googlePicture}">
+
+					<!-- 이름 -->
+					<div class="mb-3">
+						<label for="name" class="form-label">이름</label>
+						<input type="text" class="form-control" id="name" name="name">
+					</div>
+
+					<!-- 이메일 -->
+					<div class="mb-3">
+						<label class="form-label">이메일</label>
+						<div class="input-group">
+							<input type="text" class="form-control" id="emailId" name="emailId">
+							<span class="input-group-text">@</span>
+							<input type="text" class="form-control" id="emailDomain" name="emailDomain">
+							<select class="form-select" id="selectDomain">
+								<option value="">직접입력</option>
+								<option value="naver.com">naver.com</option>
+								<option value="gmail.com">gmail.com</option>
+								<option value="daum.net">daum.net</option>
+							</select>
+						</div>
+					</div>
+
+					<!-- 연락처 -->
+					<div class="mb-3">
+						<label class="form-label">연락처</label>
+						<div class="input-group">
+							<select class="form-select" style="max-width: 100px;" name="mobile1" id="mobile1">
+								<option value="010">010</option>
+								<option value="011">011</option>
+								<option value="016">016</option>
+								<option value="017">017</option>
+								<option value="018">018</option>
+								<option value="019">019</option>
+							</select>
+							<span class="input-group-text">-</span>
+							<input type="text" class="form-control" name="mobile2" id="mobile2" maxlength="4">
+							<span class="input-group-text">-</span>
+							<input type="text" class="form-control" name="mobile3" id="mobile3" maxlength="4">
+						</div>
+					</div>
+
+					<!-- 주소 -->
+					<div class="mb-3">
+						<label for="zipcode" class="form-label">우편번호</label>
+						<div class="input-group">
+							<input type="text" class="form-control" id="zipcode" name="zipcode" readonly>
+							<button type="button" class="btn btn-outline-secondary" id="btnZipcode">우편번호 찾기</button>
+						</div>
+					</div>
+
+					<div class="mb-3">
+						<label for="address1" class="form-label">기본주소</label>
+						<input type="text" class="form-control" id="address1" name="address1" readonly>
+					</div>
+
+					<div class="mb-3">
+						<label for="address2" class="form-label">상세주소</label>
+						<input type="text" class="form-control" id="address2" name="address2">
+					</div>
+
+					<!-- 이메일 수신 여부 -->
+					<div class="mb-4">
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" id="emailGet" name="emailGet">
+							<label class="form-check-label" for="emailGet">
+								이메일 수신 동의
+							</label>
+						</div>
+					</div>
+
+					<!-- 가입완료 버튼 -->
+					<button type="submit" class="btn btn-primary w-100" style="height: 50px;">가입완료</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+</html>

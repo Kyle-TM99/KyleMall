@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/main_layout}">
+	<head>
+		<style>
+			.form-control:focus, .form-select:focus {
+				border-color: #4A90E2;
+				box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+			}
+			
+			.form-label {
+				margin-bottom: 0.3rem;
+				color: #495057;
+			}
+			
+			.btn-primary {
+				background-color: #4A90E2;
+				border-color: #4A90E2;
+			}
+			
+			.btn-primary:hover {
+				background-color: #357ABD;
+				border-color: #357ABD;
+			}
+			
+			.btn-outline-primary {
+				color: #4A90E2;
+				border-color: #4A90E2;
+			}
+			
+			.btn-outline-primary:hover {
+				background-color: #4A90E2;
+				border-color: #4A90E2;
+			}
+			
+			.form-check-input:checked {
+				background-color: #4A90E2;
+				border-color: #4A90E2;
+			}
+		</style>
+	</head>
+<th:block layout:fragment="content">
+	<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	
+	<div class="container py-5">
+		<div class="row justify-content-center">
+			<div class="col-md-8 col-lg-6">
+				<div class="card shadow-sm border-0 rounded-3">
+					<div class="card-body p-4 p-md-5">
+						<!-- 로고 -->
+						<div class="text-center mb-4">
+							<img src="images/kylemall3.png" alt="KyleMall" class="img-fluid" style="max-width: 200px;">
+							<h3 class="mt-4 mb-2 fw-bold">회원정보 수정</h3>
+							<p class="text-muted small">회원정보 수정에 필요한 정보를 입력해주세요.</p>
+						</div>
+
+						<form action="memberUpdateResult" name="memberUpdateForm" method="post" id="memberUpdateForm">
+								<!-- 기본 정보 섹션 -->
+								<div class="mb-4">
+									<h6 class="fw-bold mb-3">기본 정보</h6>
+									<div class="row g-3">
+										<div class="col-md-6">
+											<label class="form-label small">이름</label>
+											<input type="text" class="form-control bg-light" id="name" name="name" 
+												   th:value="${session.member.name}" readonly/>
+										</div>
+										<div class="col-md-6">
+											<label class="form-label small">닉네임</label>
+											<input type="text" class="form-control bg-light" id="nickname" name="nickname" 
+												   th:value="${session.member.nickname}" readonly/>
+										</div>
+									</div>
+								</div>
+
+								<!-- 비밀번호 섹션 -->
+								<th:block th:if="${session.member != null and session.member.isSocial == false}">
+									<div class="mb-4">
+										<h6 class="fw-bold mb-3">비밀번호 변경</h6>
+										<div class="mb-3">
+											<label class="form-label small">기존 비밀번호</label>
+											<div class="input-group">
+												<input type="password" class="form-control" id="oldPass" name="oldPass" 
+													   placeholder="기존 비밀번호 입력"/>
+												<button type="button" class="btn btn-outline-primary" id="btnPassCheck">확인</button>
+											</div>
+										</div>
+										<div class="mb-3">
+											<label class="form-label small">새 비밀번호</label>
+											<input type="password" class="form-control" id="pass1" name="pass1" 
+												   placeholder="새 비밀번호 입력"/>
+										</div>
+										<div class="mb-3">
+											<label class="form-label small">새 비밀번호 확인</label>
+											<input type="password" class="form-control" id="pass2" name="pass2" 
+												   placeholder="새 비밀번호 확인"/>
+										</div>
+									</div>
+								</th:block>
+
+								<!-- 연락처 정보 섹션 -->
+								<div class="mb-4">
+									<h6 class="fw-bold mb-3">연락처 정보</h6>
+									<div class="mb-3">
+										<label class="form-label small">휴대폰 번호</label>
+										<div class="row g-2">
+											<div class="col-4">
+												<select class="form-select" name="mobile1" id="mobile1">
+													<option th:selected="${session.member.mobile.split('-')[0] == '010'}">010</option>
+													<option th:selected="${session.member.mobile.split('-')[0] == '011'}">011</option>
+													<option th:selected="${session.member.mobile.split('-')[0] == '016'}">016</option>
+													<option th:selected="${session.member.mobile.split('-')[0] == '017'}">017</option>
+													<option th:selected="${session.member.mobile.split('-')[0] == '018'}">018</option>
+													<option th:selected="${session.member.mobile.split('-')[0] == '019'}">019</option>
+												</select>
+											</div>
+											<div class="col-4">
+												<input type="text" class="form-control" name="mobile2" id="mobile2" 
+													   th:value="${session.member.mobile.split('-')[1]}" maxlength="4"/>
+											</div>
+											<div class="col-4">
+												<input type="text" class="form-control" name="mobile3" id="mobile3" 
+													   th:value="${session.member.mobile.split('-')[2]}" maxlength="4"/>
+											</div>
+										</div>
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label small">이메일</label>
+										<div class="row g-2">
+											<div class="col-4">
+												<input type="text" class="form-control" name="emailId" id="emailId" 
+													   th:value="${session.member.email.split('@')[0]}"/>
+											</div>
+											<div class="col-4">
+												<input type="text" class="form-control" name="emailDomain" id="emailDomain" 
+													   placeholder="@" th:value="${session.member.email.split('@')[1]}"/>
+											</div>
+											<div class="col-4">
+												<select class="form-select" name="selectDomain" id="selectDomain">
+													<option>직접입력</option>
+													<option th:selected="${session.member.email.split('@')[1] == 'naver.com'}">naver.com</option>
+													<option th:selected="${session.member.email.split('@')[1] == 'daum.net'}">daum.net</option>
+													<option th:selected="${session.member.email.split('@')[1] == 'gmail.com'}">gmail.com</option>
+												</select>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<!-- 주소 섹션 -->
+								<div class="mb-4">
+									<h6 class="fw-bold mb-3">배송지 정보</h6>
+									<div class="mb-3">
+										<label class="form-label small">우편번호</label>
+										<div class="input-group">
+											<input type="text" class="form-control" id="zipcode" name="zipcode" 
+												   th:value="${session.member.zipcode}" readonly/>
+											<button type="button" class="btn btn-outline-primary" id="btnZipcode">우편번호 찾기</button>
+										</div>
+									</div>
+									<div class="mb-3">
+										<label class="form-label small">기본주소</label>
+										<input type="text" class="form-control" id="address1" name="address1" 
+											   th:value="${session.member.address1}" readonly/>
+									</div>
+									<div class="mb-3">
+										<label class="form-label small">상세주소</label>
+										<input type="text" class="form-control" id="address2" name="address2" 
+											   th:value="${session.member.address2}"/>
+									</div>
+								</div>
+
+								<!-- 이메일 수신 동의 -->
+								<div class="mb-4">
+									<div class="form-check form-switch">
+										<input class="form-check-input" type="checkbox" role="switch" id="emailGet" 
+											   name="emailGet" th:checked="${!session.member.emailGet}"/>
+										<label class="form-check-label small" for="emailGet">이메일 수신 동의</label>
+									</div>
+								</div>
+
+								<!-- 수정하기 버튼 -->
+								<div class="d-grid">
+									<button type="submit" class="btn btn-primary py-2">수정완료</button>
+								</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>
+</html>

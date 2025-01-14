@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main_layout}">
+<th:block layout:fragment="content">
+
+	<div class="container mt-5">
+		<h2 class="text-center mb-4" style="font-weight: 700; color: #343a40;">상품 등록</h2>
+		<form action="/addProduct" method="post" enctype="multipart/form-data" class="p-4 shadow-sm rounded bg-white">
+			<div class="row">
+				<!-- 이미지 미리 보기 및 업로드 -->
+				<div class="col-md-6 d-flex flex-column align-items-center">
+					<!-- 이미지 미리 보기 -->
+					<div class="mb-3 w-100 text-center">
+						<div class="border rounded shadow-sm" style="width: 100%; height: 300px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+							<img id="imagePreview" src="https://via.placeholder.com/300" alt="이미지 미리 보기" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+						</div>
+					</div>
+					<!-- 이미지 업로드 -->
+					<div class="mb-3 w-100">
+						<label for="productImage" class="form-label">상품 이미지</label>
+						<input type="file" class="form-control" id="productImage" name="fileData1" accept="image/*" onchange="previewImage(event)">
+					</div>
+				</div>
+
+				<!-- 나머지 옵션 -->
+				<div class="col-md-6">
+					<!-- 상품명 -->
+					<div class="mb-3">
+						<label for="productName" class="form-label">상품명</label>
+						<input type="text" class="form-control rounded-pill shadow-sm" id="productName" name="productName" placeholder="상품명을 입력하세요" required>
+					</div>
+
+					<!-- 카테고리 -->
+					<div class="mb-3">
+						<label for="category" class="form-label">카테고리</label>
+						<select class="form-select rounded-pill shadow-sm" id="category" name="categoryName" required>
+							<option value="" disabled selected>카테고리를 선택하세요</option>
+							<option value="1">아우터</option>
+							<option value="2">상의</option>
+							<option value="3">하의</option>
+						</select>
+					</div>
+
+					<!-- 가격 -->
+					<div class="mb-3">
+						<label for="price" class="form-label">가격 (KRW)</label>
+						<input type="number" class="form-control rounded-pill shadow-sm" id="price" name="productPrice" placeholder="가격을 입력하세요" required>
+					</div>
+
+					<!-- 재고 -->
+					<div class="mb-3">
+						<label for="stock" class="form-label">재고</label>
+						<input type="number" class="form-control rounded-pill shadow-sm" id="stock" name="stockQuantity" placeholder="재고 수량을 입력하세요" required>
+					</div>
+
+					<!-- 설명 -->
+					<div class="mb-3">
+						<label for="description" class="form-label">상품 설명</label>
+						<textarea class="form-control rounded shadow-sm" id="description" name="productDescription" rows="4" placeholder="상품 설명을 입력하세요" required></textarea>
+					</div>
+
+					<!-- 할인 여부 -->
+					<div class="mb-3">
+						<div class="form-check">
+							<input type="checkbox" class="form-check-input" id="saleOk" name="saleOk" onchange="toggleSalePrice()">
+							<label for="saleOk" class="form-check-label">할인 여부</label>
+						</div>
+					</div>
+
+					<!-- 할인 가격 -->
+					<div class="mb-3" id="salePriceContainer" style="display: none;">
+						<label for="salePrice" class="form-label">할인 가격</label>
+						<input type="number" class="form-control rounded-pill shadow-sm" id="salePrice" name="salePrice" placeholder="할인 가격을 입력하세요">
+					</div>
+
+					<!-- 등록 버튼 -->
+					<div class="d-grid gap-2">
+						<button type="submit" class="btn btn-primary rounded-pill shadow-sm">상품 등록</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<!-- JavaScript for Image Preview and Sale Price Toggle -->
+	<script>
+		function previewImage(event) {
+			const input = event.target;
+			const preview = document.getElementById('imagePreview');
+			if (input.files && input.files[0]) {
+				const reader = new FileReader();
+				reader.onload = function (e) {
+					preview.src = e.target.result;
+				};
+				reader.readAsDataURL(input.files[0]);
+			} else {
+				preview.src = 'https://via.placeholder.com/300';
+			}
+		}
+
+		function toggleSalePrice() {
+			const saleOkCheckbox = document.getElementById('saleOk');
+			const salePriceContainer = document.getElementById('salePriceContainer');
+			if (saleOkCheckbox.checked) {
+				salePriceContainer.style.display = 'block';
+			} else {
+				salePriceContainer.style.display = 'none';
+			}
+		}
+	</script>
+</th:block>
+</html>

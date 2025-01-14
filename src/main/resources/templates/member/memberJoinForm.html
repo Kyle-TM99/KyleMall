@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/main_layout}">
+<head>
+	<style>
+		.form-control:focus, .form-select:focus {
+			border-color: #4A90E2;
+			box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+		}
+
+		.btn-primary {
+			background-color: #4A90E2;
+			border-color: #4A90E2;
+		}
+
+		.btn-primary:hover {
+			background-color: #357ABD;
+			border-color: #357ABD;
+		}
+
+		.form-label {
+			font-size: 0.9rem;
+			color: #495057;
+		}
+
+		.input-group-text {
+			background-color: #f8f9fa;
+			border-color: #ced4da;
+		}
+	</style>
+</head>
+
+<div layout:fragment="content">
+	
+	<!-- JavaScript -->
+	<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	<script th:src="@{/js/member.js}"></script>
+	<div class="container d-flex justify-content-center align-items-center my-5">
+		<div class="card shadow-lg" style="width: 500px; border-radius: 15px; border: none;">
+			<div class="card-body p-5">
+				<!-- 로고 -->
+				<div class="text-center mb-4">
+					<img src="images/kylemall3.png" alt="KyleMall Logo" style="width: 200px; height: auto;" />
+				</div>
+
+				<h2 class="text-center mb-4 fw-light">회원가입</h2>
+
+				<!-- 회원가입 폼 -->
+				<form action="joinResult" method="post" id="joinForm" name="joinForm">
+					<input type="hidden" name="isIdCheck" id="isIdCheck" value="false"/>
+					
+					<!-- 아이디 -->
+					<div class="mb-3">
+						<label for="id" class="form-label">아이디</label>
+						<div class="input-group">
+							<input type="text" class="form-control" id="id" name="id" maxlength="10">
+							<button type="button" class="btn btn-outline-secondary" id="btnOverlapId">중복확인</button>
+						</div>
+					</div>
+
+					<!-- 비밀번호 -->
+					<div class="mb-3">
+						<label for="pass1" class="form-label">비밀번호</label>
+						<input type="password" class="form-control" id="pass1" name="pass1">
+					</div>
+
+					<div class="mb-3">
+						<label for="pass2" class="form-label">비밀번호 확인</label>
+						<input type="password" class="form-control" id="pass2" name="pass2">
+					</div>
+
+					<!-- 이름 -->
+					<div class="mb-3">
+						<label for="name" class="form-label">이름</label>
+						<input type="text" class="form-control" id="name" name="name">
+					</div>
+
+					<!--	닉네임 -->
+					<div class="mb-3">
+						<label for="nickname" class="form-label">닉네임</label>
+						<div class="input-group">
+							<input type="text" class="form-control" id="nickname" name="nickname" maxlength="10">
+						</div>
+					</div>
+
+					<!-- 이메일 -->
+					<div class="mb-3">
+						<label class="form-label">이메일</label>
+						<div class="input-group">
+							<input type="text" class="form-control" id="emailId" name="emailId">
+							<span class="input-group-text">@</span>
+							<input type="text" class="form-control" id="emailDomain" name="emailDomain">
+							<select class="form-select" id="selectDomain">
+								<option value="">직접입력</option>
+								<option value="naver.com">naver.com</option>
+								<option value="gmail.com">gmail.com</option>
+								<option value="daum.net">daum.net</option>
+							</select>
+						</div>
+					</div>
+
+					<!-- 연락처 -->
+					<div class="mb-3">
+						<label class="form-label">연락처</label>
+						<div class="input-group">
+							<select class="form-select" style="max-width: 100px;" name="mobile1" id="mobile1">
+								<option value="010">010</option>
+								<option value="011">011</option>
+								<option value="016">016</option>
+								<option value="017">017</option>
+								<option value="018">018</option>
+								<option value="019">019</option>
+							</select>
+							<span class="input-group-text">-</span>
+							<input type="text" class="form-control" name="mobile2" id="mobile2" maxlength="4">
+							<span class="input-group-text">-</span>
+							<input type="text" class="form-control" name="mobile3" id="mobile3" maxlength="4">
+						</div>
+					</div>
+
+					<!-- 주소 -->
+					<div class="mb-3">
+						<label for="zipcode" class="form-label">우편번호</label>
+						<div class="input-group">
+							<input type="text" class="form-control" id="zipcode" name="zipcode" readonly>
+							<button type="button" class="btn btn-outline-secondary" id="btnZipcode">우편번호 찾기</button>
+						</div>
+					</div>
+
+					<div class="mb-3">
+						<label for="address1" class="form-label">기본주소</label>
+						<input type="text" class="form-control" id="address1" name="address1" readonly>
+					</div>
+
+					<div class="mb-3">
+						<label for="address2" class="form-label">상세주소</label>
+						<input type="text" class="form-control" id="address2" name="address2">
+					</div>
+
+					<!-- 이메일 수신 여부 -->
+					<div class="mb-4">
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" id="emailGet" name="emailGet">
+							<label class="form-check-label" for="emailGet">
+								이메일 수신 동의
+							</label>
+						</div>
+					</div>
+
+					<!-- 가입하기 버튼 -->
+					<button type="submit" class="btn btn-primary w-100" style="height: 50px;">가입하기</button>
+
+					<!-- 로그인 링크 -->
+					<div class="text-center mt-4">
+						<span class="text-muted">이미 계정이 있으신가요?</span>
+						<a href="loginForm" class="text-decoration-none ms-2" style="color: #4A90E2;">로그인</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+</html>

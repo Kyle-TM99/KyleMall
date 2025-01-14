@@ -1,0 +1,114 @@
+/* 헤더 전용 �타일 */
+.header-container {
+	background-color: #fff;
+	border-bottom: 1px solid #eee;
+	position: sticky;
+	top: 0;
+	z-index: 1000;
+}
+
+.navbar {
+	padding: 1rem 0;
+}
+
+.navbar-brand {
+	padding: 0;
+}
+
+.nav-link {
+	color: #333 !important;  /* !important로 �트스트랩 오버라이드 */
+	font-size: 0.95rem;
+	padding: 0.5rem 1rem;
+	transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+	color: #000 !important;
+}
+
+.dropdown-menu {
+	border: none !important;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	border-radius: 12px;
+	padding: 0.5rem;
+}
+
+.dropdown-item {
+	padding: 0.5rem 1rem;
+	border-radius: 8px;
+	font-size: 0.9rem;
+	color: #333 !important;
+}
+
+.dropdown-item:hover {
+	background-color: #f8f9fa !important;
+	color: #000 !important;
+}
+
+/* �바구니 뱃지 */
+.cart-badge {
+	position: absolute;
+	top: -5px;
+	right: -5px;
+	background-color: #000;
+	color: white;
+	font-size: 0.7rem;
+	padding: 0.2rem 0.5rem;
+	border-radius: 1rem;
+	min-width: 1rem;
+	text-align: center;
+}
+
+/* 헤�� 내 버튼 스타일 */
+.header-container .btn-dark {
+	background-color: #000 !important;
+	border: none !important;
+	font-size: 0.9rem;
+	transition: all 0.2s ease;
+}
+
+.header-container .btn-dark:hover {
+	background-color: #333 !important;
+	transform: translateY(-1px);
+}
+
+/* 헤더 내 아이콘 */
+.header-container .bi {
+	font-size: 1.2rem;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 991px) {
+	.navbar-nav {
+		padding: 1rem 0;
+	}
+	
+	.nav-link {
+		padding: 0.5rem 0;
+	}
+	
+	.dropdown-menu {
+		border: none !important;
+		box-shadow: none !important;
+		padding: 0;
+		margin: 0;
+	}
+	
+	.dropdown-item {
+		padding: 0.5rem 0;
+	}
+}
+
+/* 헤더 내 ��정 요소들 스타일 재정의 */
+.header-container .navbar-toggler {
+	border: none !important;
+	padding: 0;
+}
+
+.header-container .navbar-toggler:focus {
+	box-shadow: none !important;
+}
+
+.header-container .dropdown-divider {
+	border-color: #eee !important;
+}

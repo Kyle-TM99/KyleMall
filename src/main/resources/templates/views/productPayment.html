@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main_layout}">
+<th:block layout:fragment="content">
+<script src=
+	"https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	<div class="container my-5">
+	
+		<!-- 히든 폼 목록 -->
+		<form action="paymentOrder" method="post" name="orderform">
+		</form>
+		
+		<h2 class="text-center">주문/결제</h2>
+		<!-- 주문 리스트 -->
+		<section>
+			<div class="section-title fs-5 text-center my-5">주문 리스트</div>
+			<table class="table">
+				<th:block th:if="${sCart != null and not #lists.isEmpty(sCart)}" id="cartList">
+					<tbody id="cartList">
+						<tr th:each="product : ${sCart}">
+							<td>
+								<div class="d-flex align-items-center position-relative">
+									<!-- Remove button -->
+									<div class="row top-0 end-0">
+										<div class="col">
+											<input type="hidden" id="cartNo" th:value="${product.cartId}" />
+										</div>
+									</div>
+
+									<!-- Product image -->
+									<th:block th:unless="${product.imageUrl == null}">
+										<img class="card-img-top" th:src="'kylemallproducts/'+${product.imageUrl}"
+											th:alt="${product.productName}"
+											style="width: 15%; height: 200px; margin-right: 20px;" />
+									</th:block>
+									<th:block th:if="${product.imageUrl == null}">
+										<img class="card-img-top"
+											src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg"
+											th:alt="${product.productName}"
+											style="width: 15%; height: 200px; margin-right: 20px;" />
+									</th:block>
+
+
+									<!-- Product details -->
+									<div style="flex-grow: 1;">
+										<div class="row">
+											<div class="col">
+												<span class="badge bg-primary">상품 번호 : [[${product.productNo}]]</span>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col my-2">
+												<strong><span id="productName" class="fs-5 fw-bold text-dark">[[${product.productName}]]</span></strong>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col text-end text-muted">
+												<th:block th:if="${product.saleOk == '1'}">
+													<div class="badge bg-dark text-white" style="top: 0.5rem; right: 0.5rem">Sale</div>
+													<div class="product-price" data-sale="true" th:data-price="${product.salePrice}">가격 : [[${product.salePrice}]]원</div>
+												</th:block>
+												<th:block th:if="${product.saleOk == '0'}">
+													<span class="product-price" data-sale="false" th:data-price="${product.productPrice}">가격 : [[${product.productPrice}]]원</span>
+												</th:block>
+											</div>
+										</div>
+
+										<!-- Quantity input field -->
+										<div class="row my-2">
+											<div class="col text-end fs-5">
+												<label for="quantity-[[${product.productNo}]]" class="form-label">수량</label> <span>: [[${product.quantity}]]</span>
+											</div>
+										</div>
+
+									</div>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</th:block>
+				<th:block th:if="${sCart == null or #lists.isEmpty(sCart)}">
+					<tr>
+						<td class="text-center pt-5 pb-4">
+							<p>장바구니에 추가한 물건이 존재하지 않습니다.</p>
+						</td>
+					</tr>
+				</th:block>
+			</table>
+		</section>
+
+		<!-- 배송지 입력 및 결제 방식 적용 -->
+	<section>
+    <div class="section-title fs-5 text-center my-5">배송지 확인</div>
+    <div class="container">
+        <form id="order_form">
+            <div class="row mb-3 align-items-center">
+                <!-- 이름 -->
+                <div class="col-12 col-md-3 text-md-center border-end">
+                    <label for="deliveryName" class="form-label">이름</label>
+                </div>
+                <div class="col-12 col-md-9">
+                    <input type="text" name="deliveryName" id="deliveryName" class="form-control" placeholder="이름을 입력하세요">
+                </div>
+            </div>
+
+            <div class="row mb-3 align-items-center">
+                <!-- 연락처 -->
+                <div class="col-12 col-md-3 text-md-center border-end">
+                    <label class="form-label">연락처</label>
+                </div>
+                <div class="col-12 col-md-9">
+                    <div class="input-group">
+                        <input type="text" name="payPhone1" id="payPhone1" class="form-control" maxlength="4" placeholder="010">
+                        <span class="input-group-text">-</span>
+                        <input type="text" name="payPhone2" id="payPhone2" class="form-control" maxlength="4" placeholder="1234">
+                        <span class="input-group-text">-</span>
+                        <input type="text" name="payPhone3" id="payPhone3" class="form-control" maxlength="4" placeholder="5678">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3 align-items-center">
+                <!-- 비상 연락처 -->
+                <div class="col-12 col-md-3 text-md-center border-end">
+                    <label class="form-label">비상 연락처</label>
+                </div>
+                <div class="col-12 col-md-9">
+                    <div class="input-group">
+                        <input type="text" name="emergency1" id="emergency1" class="form-control" maxlength="4" placeholder="010">
+                        <span class="input-group-text">-</span>
+                        <input type="text" name="emergency2" id="emergency2" class="form-control" maxlength="4" placeholder="1234">
+                        <span class="input-group-text">-</span>
+                        <input type="text" name="emergency3" id="emergency3" class="form-control" maxlength="4" placeholder="5678">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3 align-items-center">
+                <!-- 배송지 -->
+                <div class="col-12 col-md-3 text-md-center border-end">
+                    <label class="form-label">배송지</label>
+                </div>
+                <div class="col-12 col-md-9">
+                    <div class="input-group mb-2">
+                        <input type="text" name="payZipcode" id="payZipcode" class="form-control" placeholder="우편번호">
+                        <button type="button" id="payBtnZipcode" class="btn btn-outline-primary">우편번호 찾기</button>
+                    </div>
+                    <input type="text" name="payAddress1" id="payAddress1" class="form-control mb-2" placeholder="기본 주소" readonly>
+                    <input type="text" name="payAddress2" id="payAddress2" class="form-control" placeholder="상세 주소">
+                </div>
+            </div>
+
+            <div class="row mb-3 align-items-center">
+                <!-- 주문메세지 -->
+                <div class="col-12 col-md-3 text-md-center border-end">
+                    <label for="orderMessage" class="form-label">주문메세지</label>
+                </div>
+                <div class="col-12 col-md-9">
+                    <textarea name="orderMessage" id="orderMessage" class="form-control" rows="3" placeholder="주문메세지를 입력하세요"></textarea>
+                </div>
+            </div>
+
+            <div class="row mb-3 align-items-center">
+                <!-- 배송메세지 -->
+                <div class="col-12 col-md-3 text-md-center border-end">
+                    <label for="deliveryMessage" class="form-label">배송메세지</label>
+                </div>
+                <div class="col-12 col-md-9">
+                    <textarea name="deliveryMessage" id="deliveryMessage" class="form-control" rows="3" placeholder="배송메세지를 입력하세요"></textarea>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+
+
+
+		<!-- 주문상품 할인적용 -->
+		<section>
+			<div class="section-title fs-5 text-center my-5">최종 결제금액 확인</div>
+			<table class="table price-summary text-center">
+				<thead>
+					<tr>
+						<th>상품금액</th>
+						<th>배송비</th>
+						<th>할인금액</th>
+						<th>최종 결제금액</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>[[${productPrice}]]원</td>
+						<td>[[${delivery}]]원</td>
+						<td>[추가예정]</td>
+						<td class="text-danger">[[${totalPrice}]]원</td>
+					</tr>
+				</tbody>
+			</table>
+		</section>
+
+		<!-- 결제 수단 -->
+		<div class="tbl-order">
+			
+			<div class="section-title fs-5 text-center my-5">결제수단</div>
+			
+			<table class="table">
+				<tbody>
+					<tr class="text-center">
+						<th scope="row"><div class="txt-l">결제방법</div></th>
+						<td colspan="3">
+							<ul class="pay-method" style="
+							list-style-type: none;
+				            display: flex;
+				            gap: 20px;
+				            justify-content: center;"
+				            >
+	                            <li>
+	                                <div class="form-check">
+	                                    <input form="order_form" type="radio" class="form-check-input" name="radio_paymethod" id="creditCard" value="C" checked>
+	                                    <label class="form-check-label" for="creditCard">신용카드</label>
+	                                </div>
+	                            </li>
+	                            <li>
+	                                <div class="form-check">
+	                                    <input form="order_form" type="radio" class="form-check-input" name="radio_paymethod" id="kakaoPay" value="kakaopay">
+	                                    <label class="form-check-label" for="kakaoPay">카카오페이</label>
+	                                </div>
+	                            </li>
+	                            <li>
+	                                <div class="form-check">
+	                                    <input form="order_form" type="radio" class="form-check-input" name="radio_paymethod" id="naverPay" value="N" disabled>
+	                                    <label class="form-check-label" for="naverPay">네이버페이</label>
+	                                </div>
+	                            </li>
+	                            <li>
+	                                <div class="form-check">
+	                                    <input form="order_form" type="radio" class="form-check-input" name="radio_paymethod" id="tossPay" value="T" disabled>
+	                                    <label class="form-check-label" for="tossPay">토스페이</label>
+	                                </div>
+	                            </li>
+                       		</ul>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<!-- 결제 버튼 -->
+		<div class="btn-container">
+			<div class="text-end my-5">
+				최종 결제 금액 : <span id="totalLastPrice" class="text-end fs-5">[[${totalPrice}]]원</span>
+			</div>
+			<div class="mt-3 text-center">
+				<button id="orderListPayment" class="btn btn-primary me-3">결제하기</button>
+				<button class="btn btn-secondary">주문취소</button>
+			</div>
+		</div>
+	</div>
+
+</th:block>
+
+</html>

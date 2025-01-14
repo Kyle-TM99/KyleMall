@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kylemall.shop.mapper.PaymentMapper">
+	
+	<!-- 사용자의 주문에 해당하는 상세 주문 정보를 가져오는 맵핑 구문 -->
+	<select id="getOrderDetail" resultType="OrderDetail">
+		SELECT
+			*
+		FROM
+			orderdetail od
+		INNER JOIN
+			product p ON od.product_no = p.product_no
+		WHERE
+			od.merchant_uid = #{merchantUid}
+	</select>
+	
+	<!-- 사용자의 주문, 배송 정보를 가져오는 맵핑 구문-->
+	<select id="getAllOrderSummary" resultType="OrderSummary">
+		SELECT 
+			o.merchant_uid,
+			o.product_title,
+			o.total_amount as amount,
+			o.order_status,
+			o.order_created_at,
+			s.recipient_name,
+			s.phone_number as recipient_phone,
+			s.address as recipient_address,
+			p.payment_method,
+			p.payment_status
+		FROM orders o
+		LEFT JOIN shipping s ON o.merchant_uid = s.merchant_uid
+		LEFT JOIN payment p ON o.merchant_uid = p.merchant_uid
+		WHERE o.member_id = #{memberId}
+		ORDER BY o.order_created_at DESC
+	</select>
+	
+	<!-- 사용자가 구입한 상품 총 합계 맵핑 구문-->
+	<select id="memberTotalSpent">
+		SELECT SUM(total_amount)
+		FROM orders
+		WHERE member_id = #{memberId};
+	</select>
+	
+	<!-- 주문한 상품의 결제 정보를 가져오는 맵핑 구문 -->
+	<select id="getPaymentList" resultType="Payment">
+		SELECT *
+		FROM payment
+		WHERE merchant_uid = #{merchantUid};
+	</select>
+	
+	<!-- 주문한 상품의 배송 정보를 가져오는 맵핑 구문 -->
+	<select id="getShippingList" resultType="Shipping">
+		SELECT *
+		FROM shipping
+		WHERE merchant_uid = #{merchantUid};
+	</select>
+	
+	<!-- 주문한 상품 리스트를 가져오는 맵핑 구문 -->
+	<select id="getOrderList" resultType="Order">
+		SELECT *
+		FROM orders
+		WHERE merchant_uid = #{merchantUid};
+	</select>
+	
+	<!-- 결제번호에 해당하는 결제이력이 있는지 확인하는 맵핑 구문 -->
+	<select id="orderCountCheck">
+		SELECT COUNT(*)
+		FROM payment 
+		WHERE merchant_uid = #{merchantUid};	
+	</select>
+	
+	<!-- 주문 정보를 저장하고 추가된 주문 번호를 반환하는 맵핑 구문 -->
+	<insert id="insertOrder" parameterType="Order">
+		INSERT INTO orders(merchant_uid, member_id, total_amount, product_title, order_msg) 
+		VALUES(#{merchantUid}, #{memberId}, #{totalAmount}, #{productTitle}, #{orderMsg});
+	</insert>
+	
+	<!-- 상세 주문 정보를 저장하는 맵핑 구문 -->
+	<insert id="insertOrderDetail">
+		INSERT INTO orderdetail(detail_quantity, merchant_uid, product_no) 
+		VALUES(#{detailQuantity}, #{merchantUid}, #{productNo});
+	</insert>
+	
+	<!-- 주문 정보를 저장하는 맵핑 구문 -->
+	<insert id="insertPayment" parameterType="Payment">
+		INSERT INTO payment(imp_uid, merchant_uid, payment_method, amount, paid_at) 
+		VALUES(#{impUid}, #{merchantUid}, #{paymentMethod}, #{amount}, #{paidAt});
+	</insert>
+	
+	<!-- 배송 정보를 저장하는 맵핑 구문 -->
+	<insert id="insertShipping" parameterType="Shipping">
+		INSERT INTO shipping(merchant_uid, recipient_name, address, phone_number, shipping_msg) 
+		VALUES(#{merchantUid}, #{recipientName}, #{address}, #{phoneNumber}, #{shippingMsg});
+	</insert>
+</mapper>

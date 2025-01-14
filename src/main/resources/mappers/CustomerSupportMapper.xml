@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--	
+	마이바티스 참고 사이트
+	  - http://blog.mybatis.org/
+	  - http://www.mybatis.org/mybatis-3/ko/index.html
+	  
+	@Mapper 애노테이션이 적용된 인터페이스와 맵퍼 XML파일은
+	namespace 속성으로 연결되기 때문에 맵퍼 XML의 namespace를
+	지정할 때 @Mapper 애노테이션이 적용된 맵퍼 인터페이스의
+	완전한 클래스 이름(패키지를 포함한 이름)을 지정하면 된다.   
+-->
+<mapper namespace="com.kylemall.shop.mapper.CustomerSupportMapper">
+
+	<select id="viewFaq" resultType="CustomerSupport">
+		SELECT * FROM faq
+	</select>
+	
+	<delete id="deleteFaq">
+		DELETE FROM faq WHERE faq_id = #{faqId}
+	</delete>
+	
+	<insert id="insertFaq" parameterType="map">
+		INSERT INTO faq(question, answer) 
+		VALUES(#{question}, #{answer}); 
+	</insert>
+
+</mapper>

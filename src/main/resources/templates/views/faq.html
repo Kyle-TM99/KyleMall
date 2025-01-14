@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/main_layout}">
+
+<head>
+    <title>고객지원 FAQ</title>
+    <style>
+        .faq-header {
+            margin-bottom: 20px;
+        }
+
+        .faq-answer {
+            display: none;
+            /* 기본적으로 답변을 숨깁니다. */
+        }
+    </style>
+</head>
+<th:block layout:fragment="content">
+    <div class="container mt-5">
+        <header class="faq-header text-center mb-5">
+            <h1>FAQ</h1>
+        </header>
+        <div class="text-end">
+            <th:block th:if="${session.member != null and session.member.isAdmin == true}">
+                <a href="addFaqForm" class="btn btn-primary btn-sm">FAQ 등록</a>
+            </th:block>
+        </div>
+        <div id="faqList" class="faq-container">
+            <th:block th:each="faq, status:${csFaq}">
+				<div class="faq-item my-5" th:id="'faq-'+${faq.faqId}">
+				    <h2 class="faq-question" style="cursor: pointer; color: #007BFF;">[[${faq.question}]]</h2>
+				    <div class="faq-answer fs-5">
+				        <span>[[${faq.answer}]]</span>
+				        <!-- 숨겨진 input 제거 -->
+						<th:block th:if="${session.member != null and session.member.isAdmin == true}">
+				        	<button class="btn btn-danger btn-sm mt-2 delete-faq-btn text-end">삭제</button>
+						</th:block>
+					</div>
+				</div>
+
+            </th:block>
+        </div>
+    </div>
+
+    <script>
+		$(document).ready(function () {
+		    // FAQ 질문 클릭 시 답변 토글
+		    $(document).on('click', '.faq-question', function () {
+		        $(this).next('.faq-answer').slideToggle();
+		    });
+
+		    // FAQ 삭제 버튼 클릭 시
+		    $(document).on('click', '.delete-faq-btn', function () {
+		        // 가장 가까운 .faq-item의 ID에서 FAQ ID 추출
+		        const faqId = $(this).closest('.faq-item').attr('id').split('-')[1];
+		        if (faqId) {
+		            deleteFaq(faqId);
+		        } else {
+		            console.error('FAQ ID를 가져오지 못했습니다.');
+		        }
+		    });
+		});
+
+		function deleteFaq(faqId) {
+		    console.log('삭제할 FAQ ID:', faqId);
+
+		    if (!confirm('정말로 삭제하시겠습니까?')) {
+		        return; // 사용자가 삭제를 취소한 경우
+		    }
+
+		    $.ajax({
+		        url: `deleteFaq.ajax`,
+		        type: 'post',
+		        data: { faqId: faqId },
+		        dataType: "json",
+		        success: function (resData) {
+		            // FAQ 목록 갱신
+		            $("#faqList").empty();
+
+		            resData.faqList.forEach(function (v) {
+		                const result = `
+		                    <div class="faq-item my-5" id="faq-${v.faqId}">
+		                        <h2 class="faq-question" style="cursor: pointer; color: #007BFF;">${v.question}</h2>
+		                        <div class="faq-answer fs-5">
+		                            <span>${v.answer}</span>
+		                            <button class="btn btn-danger btn-sm mt-2 delete-faq-btn">삭제</button>
+		                        </div>
+		                    </div>
+		                `;
+		                $("#faqList").append(result);
+		            });
+		        },
+		        error: function (xhr, status, error) {
+		            console.error('삭제 요청 중 오류 발생:', error);
+		            alert('FAQ 삭제에 실패했습니다.');
+		        }
+		    });
+		}
+
+    </script>
+</th:block>
+
+</html>

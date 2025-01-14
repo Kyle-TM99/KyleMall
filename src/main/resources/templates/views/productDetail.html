@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/main_layout}">
+<head>
+    <style>
+        .product-section {
+            padding: 80px 0;
+            background-color: #fff;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 600px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        }
+
+        .product-info {
+            padding-left: 40px;
+        }
+
+        .product-category {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .product-title {
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #212529;
+        }
+
+        .product-price {
+            font-size: 1.8rem;
+            color: #212529;
+            margin-bottom: 20px;
+        }
+
+        .price-original {
+            color: #6c757d;
+            text-decoration: line-through;
+            margin-right: 10px;
+        }
+
+        .price-sale {
+            color: #dc3545;
+        }
+
+        .product-description {
+            color: #495057;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .quantity-input {
+            width: 80px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 8px;
+            margin-right: 15px;
+        }
+
+        .btn-cart {
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .stock-info {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+
+        .related-section {
+            padding: 60px 0;
+            background-color: #f8f9fa;
+        }
+
+        .related-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 40px;
+            text-align: center;
+            color: #212529;
+        }
+
+        .related-card {
+            background: white;
+            border-radius: 12px;
+            border: none;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+
+        .related-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .related-card img {
+            border-radius: 12px 12px 0 0;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .badge-sale {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .btn-detail {
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<th:block layout:fragment="content">
+    <!-- 상품 상세 섹션 -->
+    <section class="product-section">
+        <div class="container">
+            <div class="row">
+                <!-- 상품 이미지 -->
+                <div class="col-md-6">
+                    <th:block th:if="${product.imageUrl == null}">
+                        <img class="product-image" src="https://dummyimage.com/600x700/dee2e6/6c757d.jpg" alt="상품 이미지" />
+                    </th:block>
+                    <th:block th:unless="${product.imageUrl == null}">
+                        <img class="product-image" th:src="'kylemallproducts/'+${product.imageUrl}" th:alt="${product.productName}" />
+                    </th:block>
+                </div>
+
+                <!-- 상품 정보 -->
+                <div class="col-md-6 product-info">
+                    <div class="product-category">상품 번호: [[${product.productNo}]]</div>
+                    <h1 class="product-title">[[${product.productName}]]</h1>
+                    
+                    <!-- 가격 정보 -->
+                    <div class="product-price">
+                        <th:block th:if="${product.saleOk == '1'}">
+                            <span class="price-original">₩[[${product.productPrice}]]</span>
+                            <span class="price-sale">₩[[${product.salePrice}]]</span>
+                        </th:block>
+                        <th:block th:unless="${product.saleOk == '1'}">
+                            <span>₩[[${product.productPrice}]]</span>
+                        </th:block>
+                    </div>
+
+                    <div class="stock-info">재고: [[${product.stockQuantity}]]개</div>
+                    <p class="product-description">[[${product.productDescription}]]</p>
+
+                    <!-- 장바구니 추가 폼 -->
+                    <div class="d-flex align-items-center">
+                        <input type="hidden" id="memberId" th:value="${session.member.id}" />
+                        <input type="hidden" id="productNo" th:value="${product.productNo}" />
+                        <input class="quantity-input" id="inputQuantity" type="number" value="1" min="1" />
+                        <button class="btn btn-dark btn-cart" id="addShoppingCart">
+                            <i class="bi bi-cart-plus me-2"></i>장바구니 담기
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 관련 상품 섹션 -->
+    <section class="related-section">
+        <div class="container">
+            <h2 class="related-title">이런 "[[${product.categoryName}]]"는 어때요?</h2>
+            <div class="row g-4">
+                <th:block th:if="${not #lists.isEmpty(pList)}">
+                    <div class="col-6 col-md-3" th:each="product : ${pList}">
+                        <div class="card related-card h-100">
+                            <th:block th:if="${product.saleOk == '1'}">
+                                <span class="badge bg-danger badge-sale">SALE</span>
+                            </th:block>
+                            
+                            <!-- 상품 이미지 -->
+                            <th:block th:unless="${product.imageUrl == null}">
+                                <img class="card-img-top" th:src="'kylemallproducts/'+${product.imageUrl}" 
+                                     th:alt="${product.productName}" />
+                            </th:block>
+                            <th:block th:if="${product.imageUrl == null}">
+                                <img class="card-img-top" src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" 
+                                     th:alt="${product.productName}" />
+                            </th:block>
+
+                            <div class="card-body text-center p-4">
+                                <h5 class="card-title mb-3">[[${product.productName}]]</h5>
+                                <div class="mb-3">
+                                    <th:block th:unless="${product.saleOk == '1'}">
+                                        <span class="fw-bold">₩[[${product.productPrice}]]</span>
+                                    </th:block>
+                                    <th:block th:if="${product.saleOk == '1'}">
+                                        <span class="text-muted text-decoration-line-through me-2">
+                                            ₩[[${product.productPrice}]]
+                                        </span>
+                                        <span class="text-danger fw-bold">₩[[${product.salePrice}]]</span>
+                                    </th:block>
+                                </div>
+                                <a class="btn btn-outline-dark btn-detail" 
+                                   th:href="@{productDetail(no=${product.productNo},category=${category})}">
+                                    상세보기
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+    </section>
+</th:block>
+</html>

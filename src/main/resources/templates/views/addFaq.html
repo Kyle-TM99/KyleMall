@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main_layout}">
+<head>
+    <title>FAQ 추가</title>
+    <style>
+        body {
+            background-color: #f8f9fa; /* 배경을 부드러운 회색으로 설정 */
+        }
+        .faq-form-container {
+            max-width: 600px;
+            margin: 50px auto;
+        }
+        .faq-card {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .faq-card h1 {
+            color: #007bff; /* 제목 강조 색상 */
+            font-weight: bold;
+        }
+        .form-control:focus {
+            border-color: #007bff; /* 포커스 시 강조 */
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <th:block layout:fragment="content">
+        <div class="faq-form-container">
+            <div class="faq-card">
+                <h1 class="text-center mb-4">FAQ 추가</h1>
+                <form action="/insertFaq" method="post" name="faqForm" id="faqForm">
+                    <div class="mb-4">
+                        <label for="question" class="form-label">질문</label>
+                        <textarea class="form-control" id="question" name="question" rows="3" placeholder="질문을 입력하세요" required></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="answer" class="form-label">답변</label>
+                        <textarea class="form-control" id="answer" name="answer" rows="5" placeholder="답변을 입력하세요" required></textarea>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary w-45">추가하기</button>
+                        <a href="/faq" class="btn btn-secondary w-45">취소</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+        <script>
+            // 폼 제출 전 확인
+            $('#faqForm').on('submit', function (e) {
+                if (!confirm('FAQ를 추가하시겠습니까?')) {
+                    e.preventDefault();
+                }
+            });
+        </script>
+    </th:block>
+</body>
+</html>

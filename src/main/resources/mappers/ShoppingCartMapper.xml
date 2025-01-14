@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--	
+	마이바티스 참고 사이트
+	  - http://blog.mybatis.org/
+	  - http://www.mybatis.org/mybatis-3/ko/index.html
+	  
+	@Mapper 애노테이션이 적용된 인터페이스와 맵퍼 XML파일은
+	namespace 속성으로 연결되기 때문에 맵퍼 XML의 namespace를
+	지정할 때 @Mapper 애노테이션이 적용된 맵퍼 인터페이스의
+	완전한 클래스 이름(패키지를 포함한 이름)을 지정하면 된다.   
+-->
+<mapper namespace="com.kylemall.shop.mapper.ShoppingCartMapper">
+	
+	<!-- 장바구니에서 주문 버튼 클릭 시 주문 테이블에 저장되는 맵핑 구문 -->
+	<insert id="insertOrder">
+		INSERT INTO orders(member_id, total_amount, ) VALUES(1, '아우터');
+	</insert>
+	
+	<!-- 장바구니 추가 시 동일 상품의 수량을 업데이하는 맵핑 구문 -->
+	<update id="updateCart" parameterType="ShoppingCart">
+        UPDATE shoppingcart
+        SET quantity = #{quantity}
+        WHERE member_id = #{memberId} AND product_no = #{productNo}
+    </update>
+
+	<!-- 사용자의 장바구니의 모든 상품을 제거하는 맵핑 구문 -->
+	<delete id="clearCart">
+        DELETE FROM shoppingcart WHERE member_id = #{memberId}
+    </delete>
+
+	<!-- 사용자의 장바구니에 상품을 제거하는 맵핑 구문 -->
+	<delete id="deleteCart">
+		DELETE FROM shoppingcart WHERE cart_id = #{no}
+	</delete>
+
+	<!-- 사용자의 장바구니에 상품을 추가하는 맵핑 구문 -->
+	<insert id="insertCart" parameterType="map" useGeneratedKeys="true">
+		INSERT INTO shoppingcart(quantity, added_at, member_id, product_no)
+		VALUES(#{count}, CURRENT_TIMESTAMP, #{memberId}, #{productNo});
+	</insert>
+
+	<!-- 사용자의 장바구니의 상품 개수를 가져오는 맵핑 구문 -->
+	<select id="getCartCount">
+		SELECT COUNT(*)
+		FROM shoppingcart
+		WHERE member_id=#{memberId}
+	</select>
+	
+	<!-- 사용자의 장바구니의 상품들을 가져오는 맵핑 구문 -->
+	<select id="getCartByMemberId" resultType="ShoppingCart">
+	    SELECT 
+	        sc.cart_id,
+	        sc.quantity, 
+	        sc.added_at,
+	        sc.member_id, 
+	        p.product_no,
+	        p.product_name, 
+	        p.product_price,
+	        p.sale_ok,
+	        p.sale_price,
+	        p.image_url
+	    FROM shoppingcart sc
+	    JOIN product p ON sc.product_no = p.product_no
+	    WHERE sc.member_id = #{memberId};
+	</select>
+	
+
+</mapper>

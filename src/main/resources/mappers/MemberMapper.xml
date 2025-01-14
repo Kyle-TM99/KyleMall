@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--	
+	마이바티스 참고 사이트
+	  - http://blog.mybatis.org/
+	  - http://www.mybatis.org/mybatis-3/ko/index.html
+	  
+	@Mapper 애노테이션이 적용된 인터페이스와 맵퍼 XML파일은
+	namespace 속성으로 연결되기 때문에 맵퍼 XML의 namespace를
+	지정할 때 @Mapper 애노테이션이 적용된 맵퍼 인터페이스의
+	완전한 클래스 이름(패키지를 포함한 이름)을 지정하면 된다.   
+-->
+<mapper namespace="com.kylemall.shop.mapper.MemberMapper">
+	
+
+	<!-- 회원 id에 해당하는 회원 정보를 삭제하는 맵핑 구문 -->
+	<delete id="deleteMember">
+		DELETE FROM member WHERE id = #{memberId};
+	</delete>
+
+	<!--회원 id에 해당하는 회원 정보를 반환하는 맵핑 구문-->
+	<select id="getMember" resultType="Member">
+		SELECT * FROM member WHERE id = #{id}
+	</select>
+	
+	<!--회원 정보를 추가하는 맵핑 구문-->
+	<insert id="addMember" parameterType="Member">
+		INSERT INTO member(id, name, pass, email, mobile, zipcode, address1, address2, email_get, reg_date, nickname, is_social, social_type, profile_image) 
+		VALUES(#{id}, #{name}, #{pass},  #{email}, #{mobile}, 
+				#{zipcode}, #{address1}, #{address2},
+				#{emailGet}, SYSDATE(), #{nickname}, #{isSocial}, #{socialType}, #{profileImage})
+	</insert>
+	
+	<!--회원 테이블에서 id에 해당하는 비밀번호를 가져오는 맵핑 구문-->
+	<select id="memberPassCheck" resultType="String">
+		SELECT 
+			pass
+		FROM member
+		WHERE id = #{id}
+	</select>
+	
+	<!--회원 정보를 수정하는 맵핑 구문-->
+	<update id="updateMember" parameterType="Member">
+		UPDATE member 
+			SET nickname=#{nickname}, pass=#{pass}, email=#{email}, mobile=#{mobile},		 
+				zipcode=#{zipcode}, address1=#{address1}, address2=#{address2}, 
+				email_get=#{emailGet}, reg_date=SYSDATE()
+		WHERE id=#{id}
+	</update>
+
+</mapper>

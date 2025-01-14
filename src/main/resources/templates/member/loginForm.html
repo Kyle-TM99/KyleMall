@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main_layout}">
+<head>
+	<style>
+		.form-control:focus {
+			border-color: #4A90E2;
+			box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+		}
+		
+		.social-login img:hover {
+			opacity: 0.9;
+			transition: opacity 0.2s;
+		}
+		
+		.btn-primary:hover {
+			background-color: #357ABD !important;
+		}
+		
+		.alert {
+			animation: fadeIn 0.5s;
+		}
+		
+		@keyframes fadeIn {from { opacity:0;
+			transform: translate(-50%, -20px);
+		}
+		
+		to {
+			opacity: 1;
+			transform: translate(-50%, 0);
+		}
+		}
+	</style>
+</head>
+<div layout:fragment="content">
+	<!-- 에러 메시지 -->
+	<div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show text-center" role="alert" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; min-width: 300px;">
+		<span th:if="${param.message}" th:text="${param.message}"></span> <span th:unless="${param.message}">로그인 처리 중 오류가 발생했습니다.</span>
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
+
+	<!-- 로그인 컨테이너 -->
+	<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+		<div class="card shadow-lg" style="width: 400px; border-radius: 15px; border: none;">
+			<div class="card-body p-5">
+				<!-- 로고 -->
+				<div class="text-center mb-4">
+					<img src="/images/kylemall3.png" alt="KyleMall Logo" style="width: 200px; height: auto;" />
+				</div>
+
+				<!-- 소셜 로그인 버튼 -->
+				<div class="social-login mb-4">
+					<!-- 카카오 로그인 버튼 -->
+					<a href="https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=785bf78e1c03819b773c1d0211d3d3a9&redirect_uri=http://localhost:8080/oauth/kakao/callback&scope=profile_nickname,profile_image&prompt=login consent"
+						class="btn btn-warning w-100 d-flex align-items-center justify-content-center gap-2 mb-3"
+						style="border-radius: 8px; height: 45px; background-color: #FEE500; border: none; color: #000000;">
+						<img src="https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_small.png" 
+							 alt="Kakao" style="height: 20px;">
+						<span>카카오로 로그인</span>
+					</a>
+
+					<!-- Google 로그인 버튼 -->
+					<a href="/oauth2/authorization/google" 
+					class="btn btn-light w-100 d-flex align-items-center justify-content-center gap-2" 
+					style="border-radius: 8px; height: 45px; border: 1px solid #ddd;"> 
+					<img src="https://www.google.com/favicon.ico" alt="Google" style="height: 20px;"> 
+					<span>GOOGLE로 로그인</span>
+					</a>
+				</div>
+
+				<!-- 구분선 -->
+				<div class="position-relative my-4">
+					<hr>
+					<span class="position-absolute top-50 start-50 translate-middle px-3 bg-white text-muted"> 또는 </span>
+				</div>
+
+				<!-- 로그인 폼 -->
+				<form id="loginForm" action="login" method="post">
+					<div class="form-floating mb-3">
+						<input type="text" class="form-control" id="userId" name="userId" placeholder="아이디" style="border-radius: 8px;" required> <label for="userId">아이디</label>
+					</div>
+					<div class="form-floating mb-4">
+						<input type="password" class="form-control" id="userPass" name="userPass" placeholder="비밀번호" style="border-radius: 8px;" required> <label for="userPass">비밀번호</label>
+					</div>
+
+					<!-- 로그인 버튼 -->
+					<button type="submit" class="btn btn-primary w-100 py-2 mb-3" style="border-radius: 8px; background-color: #4A90E2; border: none;">로그인</button>
+
+					<!-- 회원가입 링크 -->
+					<div class="text-center">
+						<p class="mb-0">
+							<span class="text-muted">아직 회원이 아니신가요?</span> <a href="/joinForm" class="text-decoration-none" style="color: #4A90E2;"> 회원가입</a>
+						</p>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+</html>
