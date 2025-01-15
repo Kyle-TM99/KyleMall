@@ -94,6 +94,30 @@
             color: white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+
+        .participants-sidebar {
+            background-color: #fff;
+            height: 600px;
+            overflow-y: auto;
+        }
+
+        .list-group-item {
+            border-left: none;
+            border-right: none;
+            border-radius: 0 !important;
+            padding: 0.75rem 1rem;
+        }
+
+        .participant-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+
+        .admin-badge {
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+        }
     </style>
 </head>
 <th:block layout:fragment="head">
@@ -110,37 +134,89 @@
                     <div class="card-header bg-white border-0 py-3">
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center">
-                                <h4 class="mb-0 fw-light">실시간 상담</h4>
+                                <h4 class="mb-0 fw-light">채팅방</h4>
                                 <span class="badge bg-success ms-2 rounded-pill">온라인</span>
+                                <button class="btn btn-outline-primary btn-sm ms-2" onclick="toggleParticipantsList()">
+                                    참여자 목록 <span class="badge bg-secondary" id="participantCount">0</span>
+                                </button>
+                            </div>
+                            <div th:if="${room.roomAdmin == session.member.id}" class="me-2">
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        방장 메뉴
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#" onclick="showTransferAdminModal()">방장 위임</a></li>
+                                        <li><a class="dropdown-item" th:href="@{'/chat/' + ${room.roomId} + '/delete'}">방 삭제</a></li>
+                                    </ul>
+                                </div>
                             </div>
                             <small class="text-muted" id="userCount">접속자 수: 0</small>
                         </div>
                     </div>
 
-                    <!-- 채팅 메시지 영역 -->
-                    <div class="card-body p-4 bg-light" style="height: 600px;">
-                        <div id="chat-messages" class="mb-4" style="height: 520px; overflow-y: auto;">
-                            <!-- 채팅 메시지들이 여기에 표시됩니다 -->
+                    <!-- 채팅 영역을 감싸는 컨테이너 수정 -->
+                    <div class="d-flex">
+                        <!-- 기존 채팅 영역 -->
+                        <div class="chat-main flex-grow-1">
+                            <div class="card-body p-4 bg-light" style="height: 600px;">
+                                <!-- 기존 채팅 메시지 영역 -->
+                                <div id="chat-messages" class="mb-4" style="height: 520px; overflow-y: auto;">
+                                    <!-- 채팅 메시지들이 여기에 표시됩니다 -->
+                                </div>
+
+                                <!-- 메시지 입력 영역 -->
+                                <div class="input-group bg-white rounded-pill shadow-sm">
+                                    <th:block th:if="${session.member.isAdmin}">
+                                        <div class="input-group-text bg-white border-0 rounded-pill">
+                                            <div class="form-check mb-0">
+                                                <input class="form-check-input" type="checkbox" id="isNotice">
+                                                <label class="form-check-label" for="isNotice">공지</label>
+                                            </div>
+                                        </div>
+                                    </th:block>
+                                    <input type="text" id="message" class="form-control border-0 rounded-pill"
+                                        placeholder="메시지를 입력하세요..." style="background: transparent;">
+                                    <button class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center" 
+                                            id="send" style="width: 38px; height: 38px; margin: 3px;">
+                                        <i class="bi bi-send-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- 메시지 입력 영역 -->
-                        <div class="input-group bg-white rounded-pill shadow-sm">
-                            <th:block th:if="${session.member.isAdmin}">
-                                <div class="input-group-text bg-white border-0 rounded-pill">
-                                    <div class="form-check mb-0">
-                                        <input class="form-check-input" type="checkbox" id="isNotice">
-                                        <label class="form-check-label" for="isNotice">공지</label>
-                                    </div>
+                        <!-- 참여자 목록 사이드바 -->
+                        <div class="participants-sidebar shadow-sm" id="participantsSidebar" style="display: none; width: 250px; border-left: 1px solid #dee2e6;">
+                            <div class="p-3">
+                                <h5 class="mb-3">참여자 목록</h5>
+                                <div id="participantsList" class="list-group">
+                                    <!-- 참여자 목록이 여기에 동적으로 추가됨 -->
                                 </div>
-                            </th:block>
-                            <input type="text" id="message" class="form-control border-0 rounded-pill"
-                                placeholder="메시지를 입력하세요..." style="background: transparent;">
-                            <button class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center" 
-                                    id="send" style="width: 38px; height: 38px; margin: 3px;">
-                                <i class="bi bi-send-fill"></i>
-                            </button>
+                            </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 방장 위임 모달 -->
+    <div class="modal fade" id="transferAdminModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">방장 위임</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>새로운 방장을 선택하세요:</p>
+                    <select class="form-select" id="newAdminSelect">
+                        <!-- 참여자 목록이 동적으로 추가됨 -->
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="transferAdmin()">위임</button>
                 </div>
             </div>
         </div>
@@ -154,6 +230,7 @@
         const nickname = /*[[${session.member.nickname}]]*/ 'default';
         const socialType = /*[[${session.member.socialType}]]*/ 'none';
         const profileImage = /*[[${session.member.profileImage}]]*/ null;
+        const roomId = /*[[${room.roomId}]]*/ 'default';
 
         function connect() {
             if(!memberId) {
@@ -162,38 +239,31 @@
                 return;
             }
 
-            console.log("Connecting to chat...");
-            console.log("Username:", memberId);
-
             const socket = new SockJS('/ws-chat');
             stompClient = Stomp.over(socket);
-
-            // 디버그 모드 활성화
-            stompClient.debug = function(str) {
-                console.log('STOMP Debug:', str);
-            };
 
             stompClient.connect({}, function(frame) {
                 console.log('Connected:', frame);
                 
-                // 구독 설정
-                stompClient.subscribe('/topic/public', function(message) {
+                // 특정 채팅방만 구독
+                stompClient.subscribe('/topic/room/' + roomId, function(message) {
                     console.log('Received:', message);
-                    onMessageReceived(message, memberId);
+                    onMessageReceived(message);
                 });
 
                 // 입장 메시지 전송
-                stompClient.send("/app/chat.addUser", {}, 
+                stompClient.send("/app/chat/room/" + roomId + "/addUser", {}, 
                     JSON.stringify({
                         sender: memberId,
+                        nickname: nickname,
                         type: 'JOIN',
+                        roomId: roomId,
                         message: nickname + ' 님이 입장하셨습니다!'
                     })
                 );
 
             }, function(error) {
                 console.error('Connection error:', error);
-                // 5초 후 재연결 시도
                 setTimeout(connect, 5000);
             });
         }
@@ -210,13 +280,13 @@
                     nickname: nickname,
                     message: messageContent,
                     type: isNotice ? 'NOTICE' : 'CHAT',
+                    roomId: roomId,
                     socialType: socialType,
                     profileImage: profileImage
                 };
                 
                 if(stompClient && stompClient.connected) {
-                    console.log('Sending message:', chatMessage);
-                    stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(chatMessage));
+                    stompClient.send("/app/chat/room/" + roomId + "/sendMessage", {}, JSON.stringify(chatMessage));
                     messageInput.value = '';
                 } else {
                     console.error('STOMP client not connected');
@@ -343,6 +413,103 @@
             ];
             return colors[Math.abs(hash % colors.length)];
         }
+
+        function showTransferAdminModal() {
+            loadParticipants(true);  // true는 모달용 로드를 의미
+            $('#transferAdminModal').modal('show');
+        }
+
+        function transferAdmin() {
+            const newAdminId = $('#newAdminSelect').val();
+            
+            $.ajax({
+                url: `/api/chat/rooms/${roomId}/transfer-admin`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ newAdminId: newAdminId }),
+                success: function(response) {
+                    if (response.success) {
+                        alert('방장 권한이 이전되었습니다.');
+                        location.reload();
+                    } else {
+                        alert(response.error || '방장 권한 이전에 실패했습니다.');
+                    }
+                    $('#transferAdminModal').modal('hide');
+                },
+                error: function(xhr, status, error) {
+                    alert('오류가 발생했습니다.');
+                }
+            });
+        }
+
+        let isParticipantsVisible = false;
+        
+        function toggleParticipantsList() {
+            const sidebar = document.getElementById('participantsSidebar');
+            isParticipantsVisible = !isParticipantsVisible;
+            sidebar.style.display = isParticipantsVisible ? 'block' : 'none';
+            
+            if (isParticipantsVisible) {
+                loadParticipants();
+            }
+        }
+        
+        function loadParticipants(forModal = false) {
+            fetch(`/api/chat/rooms/${roomId}/participants`)
+                .then(response => response.json())
+                .then(participants => {
+                    if (forModal) {
+                        // 모달의 select 옵션 업데이트
+                        const select = document.getElementById('newAdminSelect');
+                        select.innerHTML = '';
+                        participants.forEach(participant => {
+                            if (participant.id !== /*[[${session.member.id}]]*/) {
+                                const option = new Option(participant.nickname, participant.id);
+                                select.add(option);
+                            }
+                        });
+                    } else {
+                        // 사이드바의 참여자 목록 업데이트
+                        const participantsList = document.getElementById('participantsList');
+                        participantsList.innerHTML = '';
+                        
+                        participants.forEach(participant => {
+                            const item = document.createElement('div');
+                            item.className = 'list-group-item d-flex align-items-center';
+                            
+                            const isAdmin = participant.id === /*[[${room.roomAdmin}]]*/ '';
+                            
+                            item.innerHTML = `
+                                <div class="d-flex align-items-center">
+                                    ${participant.profileImage ? 
+                                        `<img src="${participant.profileImage}" class="participant-avatar me-2">` :
+                                        `<div class="participant-avatar me-2 d-flex align-items-center justify-content-center" 
+                                              style="background-color: ${getAvatarColor(participant.id)}">
+                                            ${participant.nickname.charAt(0)}
+                                         </div>`
+                                    }
+                                    <div>
+                                        <div class="fw-bold">${participant.nickname}</div>
+                                        ${isAdmin ? '<span class="badge bg-primary admin-badge">방장</span>' : ''}
+                                    </div>
+                                </div>
+                            `;
+                            
+                            participantsList.appendChild(item);
+                        });
+                        
+                        // 참여자 수 업데이트
+                        document.getElementById('participantCount').textContent = participants.length;
+                    }
+                });
+        }
+        
+        // 페이지 로드 시 참여자 목록 자동 업데이트 시작
+        setInterval(() => {
+            if (document.getElementById('participantsSidebar').style.display !== 'none') {
+                loadParticipants();
+            }
+        }, 5000);  // 5초마다 업데이트
     </script>
 </th:block>
 </html> 

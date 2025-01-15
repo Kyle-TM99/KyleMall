@@ -130,17 +130,20 @@ SELECT * FROM shipping;
 
 ######## 채팅방 ########
 DROP TABLE IF EXISTS chat_message;  
-DROP TABLE IF EXISTS chat_room;     
+DROP TABLE IF EXISTS chat_room_participant;
+DROP TABLE IF EXISTS chat_room;
 
 CREATE TABLE IF NOT EXISTS chat_room (
     room_id VARCHAR(50) PRIMARY KEY,
     room_name VARCHAR(100) NOT NULL,
     created_by VARCHAR(50) NOT NULL,
+    room_admin VARCHAR(50) NOT NULL,
     room_password VARCHAR(100),  -- 비공개방 비밀번호 (NULL이면 공개방)
     max_users INT DEFAULT 100,   -- 최대 참여 인원
     current_users INT DEFAULT 0, -- 현재 참여 인원
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_room_creator FOREIGN KEY (created_by) REFERENCES member(id)
+    CONSTRAINT fk_room_creator FOREIGN KEY (created_by) REFERENCES member(id),
+    CONSTRAINT fk_room_admin FOREIGN KEY (room_admin) REFERENCES member(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS chat_message (
@@ -164,10 +167,6 @@ CREATE TABLE IF NOT EXISTS chat_room_participant (
     CONSTRAINT fk_participant_room FOREIGN KEY (room_id) REFERENCES chat_room(room_id),
     CONSTRAINT fk_participant_member FOREIGN KEY (member_id) REFERENCES member(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- 기본 공개 채팅방 생성
-INSERT INTO chat_room (room_id, room_name, created_by) 
-VALUES ('public', '공개 채팅방', 'admin');
 
 ######### faq 게시판 ########
 DROP TABLE IF EXISTS faq;
@@ -269,6 +268,3 @@ UPDATE product SET image_url = 'trenchcoat.jpg' WHERE product_no = 25;
 UPDATE product SET image_url = 'goatjipup.jpg' WHERE product_no = 16;
 UPDATE product SET image_url = 'gajukjaket.jpg' WHERE product_no = 22;
 UPDATE product SET image_url = 'downparka.jpg' WHERE product_no = 28;
-
--- 기본 채팅방 생성
-INSERT INTO chat_room (room_id, room_name) VALUES ('public', '공개 채팅방');

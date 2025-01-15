@@ -20,11 +20,10 @@ public class ChatMessage {
     private Timestamp sentAt;    // 전송 시간
 
     public ChatMessage() {
-        this.roomId = "public";  // 기본값으로 public 채팅방 설정
+        // 기본 생성자에서 roomId를 설정하지 않음
     }
 
     public ChatMessage(String type, String sender, String message) {
-        this();
         this.type = type;
         this.sender = sender;
         this.message = message;
